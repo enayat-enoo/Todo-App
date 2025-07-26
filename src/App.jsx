@@ -1,9 +1,11 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 function App() {
   const [task, setTask] = useState("");
   const [list, setList] = useState([]);
   const [editIndex, setEditIndex]=useState(null);
+
+  const isInitialized=useRef(false);
   function handleClick() {
     if(!task) return;
     if (editIndex===null) {
@@ -25,6 +27,21 @@ function App() {
     setTask(list[index]);
     setEditIndex(index);
   }
+
+  useEffect(()=>{
+    const localList=JSON.parse(localStorage.getItem("my-todo-list"));
+    if (localList && Array.isArray(localList)) {
+      setList(localList);
+    }
+    isInitialized.current=true;
+  },[])
+
+  useEffect(() => {
+    if (isInitialized.current) {
+      localStorage.setItem("my-todo-list", JSON.stringify(list));
+    }
+  }, [list]);
+
 
   return (
     <div>
