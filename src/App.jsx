@@ -1,7 +1,7 @@
 import "./App.css";
 import { useEffect, useRef, useState } from "react";
 function App() {
-  const [task, setTask] = useState("");
+  const [task, setTask] = useState({text:"",completed:false});
   const [list, setList] = useState([]);
   const [editIndex, setEditIndex]=useState(null);
 
@@ -11,11 +11,11 @@ function App() {
     if (editIndex===null) {
       setList([...list, task]);
     }else{
-      const updatedList=list.map((val,index)=> index===editIndex ? task : val);
+      const updatedList=list.map((val,index)=> index===editIndex ? {...task,text:task.text} : val);
       setList(updatedList);
       setEditIndex(null)
     }
-    setTask("");
+    setTask({text:"",completed:false});
   }
 
   function handleDelete(indexToDelete){
@@ -42,22 +42,26 @@ function App() {
     }
   }, [list]);
 
-
+  function handleToggle(index){
+    const updatedList=list.map((value,i)=> i===index ? {...value,completed:!value.completed} : value)
+    setList(updatedList)
+  }
   return (
     <div>
       <h1>My To-do List</h1>
       <ul>
         {list.map((value, index) => (
-          <li key={index}>{value}
+          <li key={index} style={{ textDecoration: value.completed ? "line-through" : "none" }}>{value.text}
           <button onClick={()=>handleDelete(index)}>Delete</button>
           <button onClick={()=>handleEdit(index)}>{editIndex === null ? "Add the task" : "Update task"}</button>
+          <input type="checkbox" checked={value.completed} onChange={()=>handleToggle(index)} />
           </li>
         ))}
       </ul>
       <input
         type="text"
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
+        value={task.text}
+        onChange={(e) => setTask({...task,text:e.target.value})}
       />
       <br />
       <br />
